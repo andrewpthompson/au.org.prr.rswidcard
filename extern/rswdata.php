@@ -69,7 +69,7 @@ else {
 $extTplPath = dirname(__FILE__)."/../templates/";
 $template->assign('extTplPath', $extTplPath);
 $template->assign('dateFormat', $dateFormat);
-$template->display($extTplPath. "/extern/pacdata.tpl");
+$template->display($extTplPath. "/extern/rswdata.tpl");
 
 // Finished.
 
