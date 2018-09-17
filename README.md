@@ -5,6 +5,8 @@ The process is similar to creating mailing labels. The output is a PDF file.
 An ID card includes a contact's photo and a QR code that contains a URL that links to a web page that displays
 rail safety approvals, assessments, training and health data.
 
+Although it was developed specifically for use in battling the Australian rail safety red tape, it could be adapted to other purposes such as membership cards.
+
 ![Screenshot](images/screenshot.png)
 
 During installation a number of Mailing Label Formats (which are used as card formats) and Paper Sizes will be defined.
@@ -200,7 +202,7 @@ Consider privacy implications relating to the QR codes and use only reputable co
 
 ### Why is the printed card labelled 'Railway Worker' and not 'Rail Safety Worker'?
 
-The PRRPS Safety Manager suggested that the word 'Safety' be dropped to *'circumvent the current argument about "who is a RSW".'* This was a late change so this extension is still called "Rail Safety Worker ID Card" as it was developed specifically to fulfil the requirements of the Rail Safety National Law, section 125 *Identity cards*.
+The responsible manager suggested that the word 'Safety' be dropped to *'circumvent the current argument about "who is a RSW".'* This was a late change so this extension is still called "Rail Safety Worker ID Card" as it was developed specifically to fulfil the requirements of the Rail Safety National Law, section 125 *Identity cards*.
 
 'Railway' was used instead of 'Rail' to be consistent with the name of the Pichi Richi Railway Preservation Society Inc. and because it is more consistent with the railway's era of significance.
 
