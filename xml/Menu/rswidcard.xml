@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<menu>
+  <item>
+    <path>civicrm/rswidcard</path>
+    <page_callback>CRM_RswIdCard_Form_Task_IDCard</page_callback>
+    <title>Task_IDCard</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/rswidcard/settings</path>
+    <page_callback>CRM_RswIdCard_Form_Settings</page_callback>
+    <title>ID Card Extension Settings</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/rswidcard/blank</path>
+    <page_callback>CRM_RswIdCard_Form_Task_IDCard</page_callback>
+    <title>Task_IDCardBlank</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+</menu>

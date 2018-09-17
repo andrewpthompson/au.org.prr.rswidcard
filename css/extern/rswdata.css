@@ -1,0 +1,47 @@
+/* Make accordion headers clickable full-width */
+.mb-0 > button {
+  display: inline-block;
+  width: 100%;
+  padding: 0;
+  text-align: left;
+  font-size: 100%;
+}
+.help-icon {
+  padding: 20px;
+  padding-left: 5px;
+  color: rgb(13, 88, 117);
+}
+@media (max-width: 767px) {
+  #rswid-main {
+    padding: 0.25em;
+  }
+  .rsw-header {
+    padding-left: 12px;
+  }
+}
+@media (min-width: 768px) {
+  #rswid-main {
+    padding: 0.75em;
+  }
+}
+.card-header {
+  padding: 10px;
+}
+.card-body {
+  padding: 10px;
+}
+.col-approval-label {
+  width: 20%;
+}
+.col-date {
+  width: 10%;
+}
+.col-assess-label {
+  width: 20%;
+}
+.col-qual-label {
+  width: 20%;
+}
+.col-detail {
+  width: 25%;
+}

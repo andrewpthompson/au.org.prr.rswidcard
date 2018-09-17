@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<!-- civix doesn't have an option to export OptionValues only. I worked around this by creating a dummy 
+custom field group with the required fields that referred to the existing OptionGroups. Using the GUI it
+isn't possible to select non-custom field OptionGroups so I created them with any old OptionGroup and then
+modified them directly in the SQL table to refer to the paper_size and label_format OptionGroups' IDs.
+Then I ran civix generate:custom-xml -data=<custom field group ID> optionvalues_install.xml
+and then manually removed the custom field definitions from this xml file as well as the standard OptionValues.
+(Note: -data needs a double hyphen, not permitted in XML comment) -->
+
+<CustomData>
+  <OptionGroups>
+    <OptionGroup>
+      <name>paper_size</name>
+      <title>Paper Size</title>
+      <is_reserved>1</is_reserved>
+      <is_active>1</is_active>
+      <is_locked>0</is_locked>
+    </OptionGroup>
+    <OptionGroup>
+      <name>label_format</name>
+      <title>Mailing Label Format</title>
+      <is_reserved>1</is_reserved>
+      <is_active>1</is_active>
+      <is_locked>0</is_locked>
+    </OptionGroup>
+  </OptionGroups>
+  <OptionValues>
+    <OptionValue>
+      <label>Brainstorm ID Canon G/J Tray</label>
+      <value>{&quot;metric&quot;:&quot;in&quot;,&quot;width&quot;:5.16,&quot;height&quot;:10.01}</value>
+      <name>brainstorm_canon_g_j_size</name>
+      <filter>0</filter>
+      <is_default>0</is_default>
+      <weight>63</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>paper_size</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Brainstorm ID Canon K Tray</label>
+      <value>{&quot;metric&quot;:&quot;in&quot;,&quot;width&quot;:5.94,&quot;height&quot;:12.78}</value>
+      <name>brainstorm_canon_k_size</name>
+      <filter>0</filter>
+      <is_default>0</is_default>
+      <weight>64</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>paper_size</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Brainstorm ID Canon M Tray</label>
+      <value>{&quot;metric&quot;:&quot;in&quot;,&quot;width&quot;:5.82,&quot;height&quot;:8.21}</value>
+      <name>brainstorm_canon_m_size</name>
+      <filter>0</filter>
+      <is_default>0</is_default>
+      <weight>65</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>paper_size</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>CR80 Card 85.5 x 53.6 mm</label>
+      <value>{&quot;metric&quot;:&quot;mm&quot;,&quot;width&quot;:85.5,&quot;height&quot;:53.6}</value>
+      <name>CR80_card_85.5x53.6mm_size</name>
+      <filter>0</filter>
+      <is_default>0</is_default>
+      <weight>66</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>paper_size</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Avery C32015 (936220)</label>
+      <value>{&quot;paper-size&quot;:&quot;a4&quot;,&quot;orientation&quot;:&quot;portrait&quot;,&quot;font-name&quot;:&quot;helvetica&quot;,&quot;font-size&quot;:6,&quot;font-style&quot;:&quot;&quot;,&quot;NX&quot;:2,&quot;NY&quot;:4,&quot;metric&quot;:&quot;mm&quot;,&quot;lMargin&quot;:17,&quot;tMargin&quot;:31.5,&quot;SpaceX&quot;:6,&quot;SpaceY&quot;:6,&quot;width&quot;:85,&quot;height&quot;:54,&quot;lPadding&quot;:2.5,&quot;tPadding&quot;:2.5}</value>
+      <name>Avery_C32015</name>
+      <grouping>Avery</grouping>
+      <weight>24</weight>
+      <description>Matt Finish Business Cards 85 x 54 mm, Laser, Inkjet, Double Sided, 8 per sheet</description>
+      <is_active>1</is_active>
+      <option_group_name>label_format</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Avery C32028 (936229)</label>
+      <value>{&quot;paper-size&quot;:&quot;a4&quot;,&quot;orientation&quot;:&quot;portrait&quot;,&quot;font-name&quot;:&quot;helvetica&quot;,&quot;font-size&quot;:6,&quot;font-style&quot;:&quot;&quot;,&quot;NX&quot;:2,&quot;NY&quot;:4,&quot;metric&quot;:&quot;mm&quot;,&quot;lMargin&quot;:17,&quot;tMargin&quot;:31.5,&quot;SpaceX&quot;:6,&quot;SpaceY&quot;:6,&quot;width&quot;:85,&quot;height&quot;:54,&quot;lPadding&quot;:2.5,&quot;tPadding&quot;:2.5}</value>
+      <name>Avery_C32028</name>
+      <grouping>Avery</grouping>
+      <weight>25</weight>
+      <description>Gloss Finish Business Cards 85 x 54 mm, Inkjet, Double Sided, 8 per sheet</description>
+      <is_active>1</is_active>
+      <option_group_name>label_format</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Avery 5361</label>
+      <value>{&quot;paper-size&quot;:&quot;letter&quot;,&quot;orientation&quot;:&quot;portrait&quot;,&quot;font-name&quot;:&quot;helvetica&quot;,&quot;font-size&quot;:6,&quot;font-style&quot;:&quot;&quot;,&quot;NX&quot;:1,&quot;NY&quot;:3,&quot;metric&quot;:&quot;in&quot;,&quot;lMargin&quot;:4.31,&quot;tMargin&quot;:0.83,&quot;SpaceX&quot;:0,&quot;SpaceY&quot;:1.667,&quot;width&quot;:3.25,&quot;height&quot;:2,&quot;lPadding&quot;:0.1,&quot;tPadding&quot;:0.1}</value>
+      <name>Avery_5361</name>
+      <grouping>Avery Card</grouping>
+      <weight>21</weight>
+      <description>Self-Laminating ID Cards, 2&quot; x 3-1/4&quot;, 3 per sheet</description>
+      <is_active>1</is_active>
+      <option_group_name>label_format</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Avery C32011 (959078)</label>
+      <value>{&quot;paper-size&quot;:&quot;a4&quot;,&quot;orientation&quot;:&quot;portrait&quot;,&quot;font-name&quot;:&quot;helvetica&quot;,&quot;font-size&quot;:6,&quot;font-style&quot;:&quot;&quot;,&quot;NX&quot;:2,&quot;NY&quot;:5,&quot;metric&quot;:&quot;mm&quot;,&quot;lMargin&quot;:15,&quot;tMargin&quot;:13.5,&quot;SpaceX&quot;:10,&quot;SpaceY&quot;:0,&quot;width&quot;:85,&quot;height&quot;:54,&quot;lPadding&quot;:2.5,&quot;tPadding&quot;:2.5}</value>
+      <name>Avery_C32011</name>
+      <grouping>Avery Card</grouping>
+      <weight>22</weight>
+      <description>Matt Finish Business cards 85 x 54 mm, Laser, Inkjet, Single Sided, 10 per sheet</description>
+      <is_active>1</is_active>
+      <option_group_name>label_format</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Avery C32071 (980026)</label>
+      <value>{&quot;paper-size&quot;:&quot;a4&quot;,&quot;orientation&quot;:&quot;portrait&quot;,&quot;font-name&quot;:&quot;helvetica&quot;,&quot;font-size&quot;:6,&quot;font-style&quot;:&quot;&quot;,&quot;NX&quot;:2,&quot;NY&quot;:4,&quot;metric&quot;:&quot;mm&quot;,&quot;lMargin&quot;:17,&quot;tMargin&quot;:31.5,&quot;SpaceX&quot;:6,&quot;SpaceY&quot;:6,&quot;width&quot;:85,&quot;height&quot;:54,&quot;lPadding&quot;:2.5,&quot;tPadding&quot;:2.5}</value>
+      <name>Avery_C32071</name>
+      <grouping>Avery Card</grouping>
+      <weight>26</weight>
+      <description>Promotional Cards 85 x 54 mm, Inkjet, Double Sided, 8 per sheet</description>
+      <is_active>1</is_active>
+      <option_group_name>label_format</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Avery C32072 (982504)</label>
+      <value>{&quot;paper-size&quot;:&quot;a4&quot;,&quot;orientation&quot;:&quot;portrait&quot;,&quot;font-name&quot;:&quot;helvetica&quot;,&quot;font-size&quot;:6,&quot;font-style&quot;:&quot;&quot;,&quot;NX&quot;:2,&quot;NY&quot;:4,&quot;metric&quot;:&quot;mm&quot;,&quot;lMargin&quot;:17,&quot;tMargin&quot;:31.5,&quot;SpaceX&quot;:6,&quot;SpaceY&quot;:6,&quot;width&quot;:85,&quot;height&quot;:54,&quot;lPadding&quot;:2.5,&quot;tPadding&quot;:2.5}</value>
+      <name>Avery_C32072</name>
+      <grouping>Avery Card</grouping>
+      <weight>27</weight>
+      <description>Placecards 85 x 54 mm, Laser, Inkjet, Double Sided, 8 per sheet</description>
+      <is_active>1</is_active>
+      <option_group_name>label_format</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Avery C32074 (980038)</label>
+      <value>{&quot;paper-size&quot;:&quot;a4&quot;,&quot;orientation&quot;:&quot;portrait&quot;,&quot;font-name&quot;:&quot;helvetica&quot;,&quot;font-size&quot;:6,&quot;font-style&quot;:&quot;&quot;,&quot;NX&quot;:2,&quot;NY&quot;:4,&quot;metric&quot;:&quot;mm&quot;,&quot;lMargin&quot;:17,&quot;tMargin&quot;:31.5,&quot;SpaceX&quot;:6,&quot;SpaceY&quot;:6,&quot;width&quot;:85,&quot;height&quot;:54,&quot;lPadding&quot;:2.5,&quot;tPadding&quot;:2.5}</value>
+      <name>Avery_C32074</name>
+      <grouping>Avery Card</grouping>
+      <weight>28</weight>
+      <description>Multi-Purpose Cards 85 x 54 mm, Laser, Inkjet, Double Sided, 8 per sheet</description>
+      <is_active>1</is_active>
+      <option_group_name>label_format</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Avery C32026 (936230)</label>
+      <value>{&quot;paper-size&quot;:&quot;a4&quot;,&quot;orientation&quot;:&quot;portrait&quot;,&quot;font-name&quot;:&quot;helvetica&quot;,&quot;font-size&quot;:6,&quot;font-style&quot;:&quot;&quot;,&quot;NX&quot;:2,&quot;NY&quot;:5,&quot;metric&quot;:&quot;mm&quot;,&quot;lMargin&quot;:15,&quot;tMargin&quot;:13.5,&quot;SpaceX&quot;:10,&quot;SpaceY&quot;:0,&quot;width&quot;:85,&quot;height&quot;:54,&quot;lPadding&quot;:2.5,&quot;tPadding&quot;:2.5}</value>
+      <name>Avery_C32026</name>
+      <grouping>Avery Card</grouping>
+      <weight>23</weight>
+      <description>Satin Finish Business cards 85 x 54 mm, Laser, Inkjet, Double Sided, 10 per sheet</description>
+      <is_active>1</is_active>
+      <option_group_name>label_format</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Brainstorm ID Teslin Paper 8-Up Normal/Perf</label>
+      <value>{&quot;paper-size&quot;:&quot;letter&quot;,&quot;orientation&quot;:&quot;portrait&quot;,&quot;font-name&quot;:&quot;helvetica&quot;,&quot;font-size&quot;:6,&quot;font-style&quot;:&quot;&quot;,&quot;NX&quot;:2,&quot;NY&quot;:4,&quot;metric&quot;:&quot;in&quot;,&quot;lMargin&quot;:0.65,&quot;tMargin&quot;:0.6,&quot;SpaceX&quot;:0.45,&quot;SpaceY&quot;:0.43,&quot;width&quot;:3.36,&quot;height&quot;:2.1,&quot;lPadding&quot;:0.1,&quot;tPadding&quot;:0.1}</value>
+      <name>Brainstorm_Teslin_8up</name>
+      <grouping>Brainstorm ID Card</grouping>
+      <weight>20</weight>
+      <is_active>1</is_active>
+      <option_group_name>label_format</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Brainstorm ID Epson 1430 PVC Card Tray</label>
+      <value>{&quot;paper-size&quot;:&quot;a4&quot;,&quot;orientation&quot;:&quot;portrait&quot;,&quot;font-name&quot;:&quot;helvetica&quot;,&quot;font-size&quot;:6,&quot;font-style&quot;:&quot;&quot;,&quot;NX&quot;:2,&quot;NY&quot;:2,&quot;metric&quot;:&quot;in&quot;,&quot;lMargin&quot;:0.207,&quot;tMargin&quot;:0.544,&quot;SpaceX&quot;:0.048,&quot;SpaceY&quot;:0.14,&quot;width&quot;:3.375,&quot;height&quot;:2.125,&quot;lPadding&quot;:0.1,&quot;tPadding&quot;:0.1}</value>
+      <name>Brainstorm_Epson_1430</name>
+      <grouping>Brainstorm ID Card</grouping>
+      <weight>18</weight>
+      <is_active>1</is_active>
+      <option_group_name>label_format</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Brainstorm ID Epson R200/R280 PVC Card Tray</label>
+      <value>{&quot;paper-size&quot;:&quot;a4&quot;,&quot;orientation&quot;:&quot;portrait&quot;,&quot;font-name&quot;:&quot;helvetica&quot;,&quot;font-size&quot;:6,&quot;font-style&quot;:&quot;&quot;,&quot;NX&quot;:1,&quot;NY&quot;:2,&quot;metric&quot;:&quot;in&quot;,&quot;lMargin&quot;:1.265,&quot;tMargin&quot;:0.446,&quot;SpaceX&quot;:0,&quot;SpaceY&quot;:0.243,&quot;width&quot;:3.375,&quot;height&quot;:2.125,&quot;lPadding&quot;:0.1,&quot;tPadding&quot;:0.1}</value>
+      <name>Brainstorm_Epson_R200</name>
+      <grouping>Brainstorm ID Card</grouping>
+      <weight>19</weight>
+      <is_active>1</is_active>
+      <option_group_name>label_format</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Brainstorm ID Canon G PVC Card Tray</label>
+      <value>{&quot;paper-size&quot;:&quot;brainstorm_canon_g_j_size&quot;,&quot;orientation&quot;:&quot;landscape&quot;,&quot;font-name&quot;:&quot;helvetica&quot;,&quot;font-size&quot;:6,&quot;font-style&quot;:&quot;&quot;,&quot;NX&quot;:1,&quot;NY&quot;:2,&quot;metric&quot;:&quot;in&quot;,&quot;lMargin&quot;:4.195,&quot;tMargin&quot;:0.325,&quot;SpaceX&quot;:0,&quot;SpaceY&quot;:0.294,&quot;width&quot;:3.358,&quot;height&quot;:2.114,&quot;lPadding&quot;:0.1,&quot;tPadding&quot;:0.1}</value>
+      <name>Brainstorm_Canon_G_vertical</name>
+      <grouping>Brainstorm ID Card</grouping>
+      <weight>17</weight>
+      <description>Cards vertical</description>
+      <is_active>1</is_active>
+      <option_group_name>label_format</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Brainstorm ID Canon J PVC Card Tray</label>
+      <value>{&quot;paper-size&quot;:&quot;brainstorm_canon_g_j_size&quot;,&quot;orientation&quot;:&quot;landscape&quot;,&quot;font-name&quot;:&quot;helvetica&quot;,&quot;font-size&quot;:6,&quot;font-style&quot;:&quot;&quot;,&quot;NX&quot;:1,&quot;NY&quot;:2,&quot;metric&quot;:&quot;in&quot;,&quot;lMargin&quot;:3.67,&quot;tMargin&quot;:0.325,&quot;SpaceX&quot;:0,&quot;SpaceY&quot;:0.295,&quot;width&quot;:3.375,&quot;height&quot;:2.125,&quot;lPadding&quot;:0.1,&quot;tPadding&quot;:0.1}</value>
+      <name>Brainstorm_Canon_J_std_vertical</name>
+      <grouping>Brainstorm ID Card</grouping>
+      <weight>15</weight>
+      <description>Standard Canon J Tray layout - not for MX920 Series. Cards vertical.</description>
+      <is_active>1</is_active>
+      <option_group_name>label_format</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Brainstorm ID Canon J (MX920 Series) PVC Card Tray</label>
+      <value>{&quot;paper-size&quot;:&quot;brainstorm_canon_g_j_size&quot;,&quot;orientation&quot;:&quot;landscape&quot;,&quot;font-name&quot;:&quot;helvetica&quot;,&quot;font-size&quot;:6,&quot;font-style&quot;:&quot;&quot;,&quot;NX&quot;:1,&quot;NY&quot;:2,&quot;metric&quot;:&quot;in&quot;,&quot;lMargin&quot;:3.06,&quot;tMargin&quot;:0.295,&quot;SpaceX&quot;:0,&quot;SpaceY&quot;:0.295,&quot;width&quot;:3.375,&quot;height&quot;:2.125,&quot;lPadding&quot;:0.1,&quot;tPadding&quot;:0.1}</value>
+      <name>Brainstorm_Canon_J_alt_vertical</name>
+      <grouping>Brainstorm ID Card</grouping>
+      <weight>16</weight>
+      <description>Alternate Canon J Tray layout for MX920 Series. Cards vertical.</description>
+      <is_active>1</is_active>
+      <option_group_name>label_format</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Brainstorm ID Canon K PVC Card Tray</label>
+      <value>{&quot;paper-size&quot;:&quot;brainstorm_canon_k_size&quot;,&quot;orientation&quot;:&quot;portrait&quot;,&quot;font-name&quot;:&quot;helvetica&quot;,&quot;font-size&quot;:6,&quot;font-style&quot;:&quot;&quot;,&quot;NX&quot;:1,&quot;NY&quot;:2,&quot;metric&quot;:&quot;in&quot;,&quot;lMargin&quot;:1.509,&quot;tMargin&quot;:5.889,&quot;SpaceX&quot;:0,&quot;SpaceY&quot;:0.179,&quot;width&quot;:3.375,&quot;height&quot;:2.125,&quot;lPadding&quot;:0.1,&quot;tPadding&quot;:0.1}</value>
+      <name>Brainstorm_Canon_K</name>
+      <grouping>Brainstorm ID Card</grouping>
+      <weight>13</weight>
+      <is_active>1</is_active>
+      <option_group_name>label_format</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Brainstorm ID Canon M PVC Card Tray</label>
+      <value>{&quot;paper-size&quot;:&quot;brainstorm_canon_m_size&quot;,&quot;orientation&quot;:&quot;portrait&quot;,&quot;font-name&quot;:&quot;helvetica&quot;,&quot;font-size&quot;:6,&quot;font-style&quot;:&quot;&quot;,&quot;NX&quot;:1,&quot;NY&quot;:2,&quot;metric&quot;:&quot;in&quot;,&quot;lMargin&quot;:1.223,&quot;tMargin&quot;:1.935,&quot;SpaceX&quot;:0,&quot;SpaceY&quot;:0.086,&quot;width&quot;:3.375,&quot;height&quot;:2.125,&quot;lPadding&quot;:0.1,&quot;tPadding&quot;:0.1}</value>
+      <name>Brainstorm_Canon_M</name>
+      <grouping>Brainstorm ID Card</grouping>
+      <weight>14</weight>
+      <is_active>1</is_active>
+      <option_group_name>label_format</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>CR80 PVC Card (85.5 x 53.6mm, card only - no white space)</label>
+      <value>{&quot;paper-size&quot;:&quot;CR80_card_85.5x53.6mm_size&quot;,&quot;orientation&quot;:&quot;landscape&quot;,&quot;font-name&quot;:&quot;helvetica&quot;,&quot;font-size&quot;:6,&quot;font-style&quot;:&quot;&quot;,&quot;NX&quot;:1,&quot;NY&quot;:1,&quot;metric&quot;:&quot;mm&quot;,&quot;lMargin&quot;:0,&quot;tMargin&quot;:0,&quot;SpaceX&quot;:0,&quot;SpaceY&quot;:0,&quot;width&quot;:86,&quot;height&quot;:54,&quot;lPadding&quot;:2.5,&quot;tPadding&quot;:2.5}</value>
+      <name>CR80_PVC_card</name>
+      <grouping>PVC Card</grouping>
+      <weight>15</weight>
+      <is_active>1</is_active>
+      <option_group_name>label_format</option_group_name>
+    </OptionValue>
+  </OptionValues>
+</CustomData>

@@ -1,0 +1,35 @@
+{htxt id="id-rswidcard-label-name-select"}
+  <p>The Rail Safety Worker ID Card extension has been designed to print on several types of proprietary cards: Avery card sheets and Brainstorm ID inkjet-printable PVC cards and Teslin paper. Select one from the drop-down list.</p>
+  <p>If you are printing to plain card or paper then select one of the Avery A4 types e.g. C32011. You may wish to enable <b>Print borders</b> if using plain card/paper.</p>
+{/htxt}
+
+{htxt id="id-rswidcard-print-bg-image-checkbox"}
+  <p>This option, which is selected by default, selects whether or not the pre-defined background image will be included on the ID cards.</p>
+  <p>This image cannot be changed.</p>
+{/htxt}
+
+{htxt id="id-rswidcard-print-border-checkbox"}
+  <p>Enable this option if you will be printing on plain paper or card and need borders printed as an aid in the manual cutting of the cards.</p>
+  <p>If you are using proprietary cards do not enable this option.</p>
+{/htxt}
+
+{htxt id="id-rswidcard-round-corners-checkbox"}
+  <p>Rounds the corners of the cards i.e. round the corners of the background image and border if selected. This option is only useful if the cards will be printed on plain paper or card.</p>
+{/htxt}
+
+{htxt id="id-rswidcard-bg-image-bleed-value"}
+  <p>When printing to Avery or Brainstorm cards, slight misalignments could cause white edges on the cards. To avoid this you can specify a "bleed" in millimetres. 
+  The background image will be printed larger than the card area so that it bleeds over the card edges. For example specifying a bleed of 1 mm will print the background image oversize so that it bleeds 1 mm in all directions (left, top, right and bottom).</p>
+  <p>Do not use this option if you will be manually cutting the cards.</p>
+{/htxt}
+
+{htxt id="id-rswidcard-excl-existing-checkbox"}
+  <p>This option is selected by default as a precaution. As only the latest ID card details for each worker are stored in the database, generating another ID card would mean that the existing ID card's QR code would no longer work.</p>
+  <p>When this option is selected no card will be created for contacts with card details recorded in the database already, even though they were in the list of selected contacts. If all contacts have an ID card already then the PDF will be blank.</p>
+  <p>If you are issuing replacement cards then unselect this option.</p>
+{/htxt}
+
+{htxt id="id-rswidcard-is-test-checkbox"}
+  <p>Use this option when testing PDF creation and printing only.</p>
+  <p>If selected, nothing will be written to the database. QR codes will not work. An activity will not be recorded.</p>
+{/htxt}

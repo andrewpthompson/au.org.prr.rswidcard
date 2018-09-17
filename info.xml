@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<extension key="au.org.prr.rswidcard" type="module">
+  <file>rswidcard</file>
+  <name>Rail Safety Worker ID Card</name>
+  <description>
+    This extension enables the generation of rail safety worker identification cards. The process is 
+    similar to creating mailing labels. The output is a PDF file.
+    An ID card includes a contact's photo and a QR code that contains a URL that links to a web page that displays
+    rail safety approvals, assessments, training and health data. This is a stand-alone web page 
+    (but it is included in this extension) that retrieves data from CiviCRM's database.
+  </description>
+  <license>AGPL-3.0</license>
+  <maintainer>
+    <author>Andrew Thompson</author>
+    <email>andrew.thompson@prr.org.au</email>
+  </maintainer>
+  <urls>
+    <url desc="Main Extension Page"></url>
+    <url desc="Documentation"></url>
+    <url desc="Support"></url>
+    <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
+  </urls>
+  <releaseDate>2018-09-13</releaseDate>
+  <version>1.1.0</version>
+  <develStage>stable</develStage>
+  <compatibility>
+    <ver>4.7</ver>
+    <ver>5.0</ver>
+  </compatibility>
+  <comments>Presently the page displayed from the QR code's URL is highly PRRPS-specific and will need to be modified.</comments>
+  <civix>
+    <namespace>CRM/RswIdCard</namespace>
+  </civix>
+</extension>
