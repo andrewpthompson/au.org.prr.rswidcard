@@ -1,7 +1,8 @@
 <?php
 // Perform bootstrap of CiviCRM
 // Edit the below line with the correct path to CiviCRM
-require_once '../membership/administrator/components/com_civicrm/civicrm/civicrm.config.php';
+//require_once '../membership/administrator/components/com_civicrm/civicrm/civicrm.config.php';
+require_once '../wp-content/plugins/civicrm/civicrm/civicrm.config.php';
 
 require_once 'CRM/Core/Config.php';
 $config = CRM_Core_Config::singleton();
@@ -48,7 +49,7 @@ elseif (isset($recaptchaResponse)) {
   
   if ($resp->isSuccess()) {
     if (validateKey($cid, $key) === true) {
-      getRSWData($cid, $template);
+      getPACMemberData($cid, $template);
     }
     else {
       $template->assign('errMsg', "The QR code was read incorrectly, the identity card has been de-activated, or no record was found for the worker. Try re-scanning the QR code.");
@@ -68,7 +69,7 @@ else {
 $extTplPath = dirname(__FILE__)."/../templates/";
 $template->assign('extTplPath', $extTplPath);
 $template->assign('dateFormat', $dateFormat);
-$template->display($extTplPath. "/extern/rswdata.tpl");
+$template->display($extTplPath. "/extern/pacdata.tpl");
 
 // Finished.
 
@@ -79,11 +80,11 @@ function validateKey($cid, $key) {
     
     // Get contact's key hash from database and validate it
     try {
-      $result = civicrm_api3('Contact', 'getsingle', array(
+      $result = civicrm_api3('Contact', 'getsingle', [
         'sequential' => 1,
-        'return' => array("$cfCardHash"),
+        'return' => ["$cfCardHash"],
         'id' => $cid,
-      ));
+      ]);
       $keyHash = $result[$cfCardHash];
       if (strlen($keyHash) > 20 && password_verify($key, $keyHash)) {
         return true;
@@ -96,137 +97,211 @@ function validateKey($cid, $key) {
   return false;
 }
 
-function getRSWData($cid, &$template) {
+function getPACMemberData($cid, &$template) {
   // Get contact's full name and assign to a template variable
   $template->assign('fullName', getFullName($cid));
-
-  getRSHealthData($cid, $template);
-  getApprovalsData($cid, $template);
-  getTrainingAssessData($cid, $template);
-  getExternalQualData($cid, $template);
-}
-
-function getApprovalsData($cid, &$template) {
-  // Query to get the current PRRPS approvals
-  $query = "  
-    SELECT ov1.label AS app_approval_name, cf.prrapprov_date AS app_date, cf.prrapprov_date_expiry AS app_exp_date, cf.prrapprov_other_detail AS app_other_detail  
-    FROM civicrm_value_prrps_approvals cf
-    INNER JOIN civicrm_option_value ov1
-    ON cf.prrapprov_category = ov1.value
-    AND ov1.option_group_id = 98
-    WHERE cf.prrapprov_is_latest_record = 1
-    AND cf.prrapprov_is_withdrawn = 0
-    AND (cf.prrapprov_date_expiry IS NULL OR cf.prrapprov_date_expiry = '0000-00-00 00:00:00' OR cf.prrapprov_date_expiry > now())
-    AND cf.entity_id = " . $cid . "
-    ORDER BY app_date DESC;
-  ";
-  $dao = CRM_Core_DAO::executeQuery($query);
-  $result = $dao->fetchAll();
-
-  if (is_array($result)) {
-    $template->assign('approvals', $result);
-  } else {
-    $template->assign('approvals', array('is_error' => 1));
-  }  
-}
-
-function getTrainingAssessData($cid, &$template) {
-  // Query to get the current PRRPS training and assessments
-  $query = "  
-    SELECT ov1.label AS ass_trg_assess_name, ov2.label AS ass_record_type, cf.prrasstrg_date AS ass_date, 
-      cf.prrasstrg_date_expiry AS ass_exp_date, cf.prrasstrg_other_detail AS ass_other_detail  
-    FROM civicrm_value_prrps_assessments_training AS cf
-    INNER JOIN civicrm_option_value AS ov1
-    ON cf.prrasstrg_category = ov1.value
-    AND ov1.option_group_id = 100
-    INNER JOIN civicrm_option_value ov2
-    ON cf.prrasstrg_record_type = ov2.value
-    AND ov2.option_group_id = 99
-    INNER JOIN civicrm_option_value ov3
-    ON cf.prrasstrg_assessment_result = ov3.value
-    AND ov3.option_group_id = 101
-    WHERE cf.prrasstrg_is_latest_record = 1
-    AND (cf.prrasstrg_date_expiry IS NULL OR cf.prrasstrg_date_expiry = '0000-00-00 00:00:00' OR cf.prrasstrg_date_expiry > now())
-    AND cf.prrasstrg_assessment_result <> '2' -- 2 = Not yet competent
-    AND cf.entity_id = " . $cid . "
-    ORDER BY ass_date DESC;
-  ";
-  $dao = CRM_Core_DAO::executeQuery($query);
-  $result = $dao->fetchAll();
-
-  if (is_array($result)) {
-    $template->assign('trgassessments', $result);
-  } else {
-    $template->assign('trgassessments', array('is_error' => 1));
-  }  
-}
-
-function getExternalQualData($cid, &$template) {
-  // Query to get the current external qualifications and training data
-  $query = "  
-    SELECT ov1.label AS extqu_qualtrg_name, cf.extqualtrg_date AS extqu_date, cf.extqualtrg_date_expiry AS extqu_exp_date, cf.extqualtrg_other_detail AS extqu_other_detail  
-    FROM civicrm_value_external_training_quals cf
-    INNER JOIN civicrm_option_value ov1
-    ON cf.extqualtrg_category = ov1.value
-    AND ov1.option_group_id = 131
-    WHERE cf.extqualtrg_is_latest_record = 1
-    AND (cf.extqualtrg_date_expiry IS NULL OR cf.extqualtrg_date_expiry = '0000-00-00 00:00:00' OR cf.extqualtrg_date_expiry > now())
-    AND cf.entity_id = " . $cid . "
-    ORDER BY extqu_date DESC;
-  ";
-  $dao = CRM_Core_DAO::executeQuery($query);
-  $result = $dao->fetchAll();
-
-  if (is_array($result)) {
-    $template->assign('extQuals', $result);
-  } else {
-    $template->assign('extQuals', array('is_error' => 1));
-  }  
-}
   
-function getRSHealthData($cid, &$template) {
-  // Query to get the most recent health assessment 
-  $query = "
-    SELECT ov1.label AS ha_category, ov2.label AS ha_result, cf.rshealth_date AS ha_date, cf.rshealth_date_expiry AS ha_exp_date, 
-      cf.rshealth_conditions AS ha_conditions, cf.rshealth_other_detail as ha_other_detail 
-    FROM civicrm_value_rail_safety_health cf
-    INNER JOIN civicrm_option_value ov1
-    ON cf.rshealth_category = ov1.value
-    AND ov1.option_group_id = 92
-    INNER JOIN civicrm_option_value ov2
-    ON cf.rshealth_fitness = ov2.value
-    AND ov2.option_group_id = 93
-    WHERE cf.rshealth_is_latest_record = 1
-    AND cf.entity_id = " . $cid . "
-    ORDER BY ha_date DESC
-    LIMIT 1
-  ";
-  $dao = CRM_Core_DAO::executeQuery($query);
-  $result = $dao->fetchAll();
+  getMembershipData($cid, $template);
+  getLicenceMedicalData($cid, $template);
+}
 
-
-  // Assign the most recent health assessment details to template variables
-  if (is_array($result) && array_key_exists(0, $result)) {
-    $template->assign('health', $result[0]);
-    
-    // "Decode" the Conditions field checkbox values
-    if ($result[0]['ha_conditions']) {
-      $conditionsFieldId = CRM_Core_BAO_CustomField::getCustomFieldID('Conditions', 'Rail_Safety_Health');
-      $template->assign('ha_conditions', getCustomOptionLabels($result[0]['ha_conditions'], $conditionsFieldId));
-    }
+// Gets membership data and makes it available to the template
+function getMembershipData($cid, &$template) {
+  $result = civicrm_api3('Membership', 'get', [
+    'sequential' => 1,
+    'return' => ["membership_type_id.name", "membership_type_id", "status_id", "status_id.name", "join_date", "start_date", "end_date"],
+    'contact_id' => $cid,
+    'options' => ['limit' => 1, 'sort' => "end_date desc"],
+  ]);
+  // Get the first element in the results array and assign it to a template variable
+  if (is_array($result)) {
+    $membership = current($result['values']);
+    $template->assign('membership', $membership);
   } else {
-    $template->assign('health', array('is_error' => 1));
+    $template->assign('membership', ['is_error' => 1]);
   }
 }
+
+// Gets custom field data from the single-record Licence and Medical 
+// Certification custom field group and makes it available to the template
+function getLicenceMedicalData($cid, &$template) {
+  if ($cid) {
+    $fields = [
+      'Aviation_Reference_Number' => NULL,
+      //'Medical_Certificate' => NULL, // Can't display files without being logged in
+      'Licence_Type' => NULL,
+      'Ratings' => NULL,
+      //'Licence' => NULL, // Can't display files without being logged in
+      'Medical_Class' => NULL,
+      'Medical_Expiry_Date' => NULL,
+      'Aeroplane_Flight_Review_Expires' => NULL,
+      'Last_Flight' => NULL,
+    ];
+    
+    // Get custom field names
+    $fieldList = [];
+    foreach ($fields as $fieldName => &$cfName) {
+      $cfName = "custom_" . CRM_Core_BAO_CustomField::getCustomFieldID($fieldName, 'Licence_and_Medical_Certificate');
+      $fieldList[] = $cfName;
+    }
+    
+    // API query to get values for these custom fields
+    try {
+      $result = civicrm_api3('Contact', 'getsingle', [
+        'sequential' => 1,
+        'return' => $fieldList,
+        'id' => $cid,
+      ]);
+      if (is_array($result)) {
+        // Get URLs for the file fields. Doesn't work as it is necessary to be logged in.
+        // $url = CRM_Core_BAO_CustomField::getFileURL($cid, NULL, $result[$fields['Licence']]);
+        // $result[$fields['Licence']] = $url['file_url'];
+        // $url = CRM_Core_BAO_CustomField::getFileURL($cid, NULL, $result[$fields['Medical_Certificate']]);
+        // $result[$fields['Medical_Certificate']] = $url['file_url'];
+        
+        $template->assign('licenceAndMedical', $result);
+        $template->assign('fields', $fields);
+      } else {
+        $template->assign('licenceAndMedical', ['is_error' => 1]);
+      }
+    }
+    catch (CiviCRM_API3_Exception $e) {
+      // do nothing
+    }
+  }
+}
+
+// function getRSWData($cid, &$template) {
+//   // Get contact's full name and assign to a template variable
+//   $template->assign('fullName', getFullName($cid));
+
+//   getRSHealthData($cid, $template);
+//   getApprovalsData($cid, $template);
+//   getTrainingAssessData($cid, $template);
+//   getExternalQualData($cid, $template);
+// }
+
+// function getApprovalsData($cid, &$template) {
+//   // Query to get the current PRRPS approvals
+//   $query = "  
+//     SELECT ov1.label AS app_approval_name, cf.prrapprov_date AS app_date, cf.prrapprov_date_expiry AS app_exp_date, cf.prrapprov_other_detail AS app_other_detail  
+//     FROM civicrm_value_prrps_approvals cf
+//     INNER JOIN civicrm_option_value ov1
+//     ON cf.prrapprov_category = ov1.value
+//     AND ov1.option_group_id = 98
+//     WHERE cf.prrapprov_is_latest_record = 1
+//     AND cf.prrapprov_is_withdrawn = 0
+//     AND (cf.prrapprov_date_expiry IS NULL OR cf.prrapprov_date_expiry = '0000-00-00 00:00:00' OR cf.prrapprov_date_expiry > now())
+//     AND cf.entity_id = " . $cid . "
+//     ORDER BY app_date DESC;
+//   ";
+//   $dao = CRM_Core_DAO::executeQuery($query);
+//   $result = $dao->fetchAll();
+
+//   if (is_array($result)) {
+//     $template->assign('approvals', $result);
+//   } else {
+//     $template->assign('approvals', ['is_error' => 1]);
+//   }  
+// }
+
+// function getTrainingAssessData($cid, &$template) {
+//   // Query to get the current PRRPS training and assessments
+//   $query = "  
+//     SELECT ov1.label AS ass_trg_assess_name, ov2.label AS ass_record_type, cf.prrasstrg_date AS ass_date, 
+//       cf.prrasstrg_date_expiry AS ass_exp_date, cf.prrasstrg_other_detail AS ass_other_detail  
+//     FROM civicrm_value_prrps_assessments_training AS cf
+//     INNER JOIN civicrm_option_value AS ov1
+//     ON cf.prrasstrg_category = ov1.value
+//     AND ov1.option_group_id = 100
+//     INNER JOIN civicrm_option_value ov2
+//     ON cf.prrasstrg_record_type = ov2.value
+//     AND ov2.option_group_id = 99
+//     INNER JOIN civicrm_option_value ov3
+//     ON cf.prrasstrg_assessment_result = ov3.value
+//     AND ov3.option_group_id = 101
+//     WHERE cf.prrasstrg_is_latest_record = 1
+//     AND (cf.prrasstrg_date_expiry IS NULL OR cf.prrasstrg_date_expiry = '0000-00-00 00:00:00' OR cf.prrasstrg_date_expiry > now())
+//     AND cf.prrasstrg_assessment_result <> '2' -- 2 = Not yet competent
+//     AND cf.entity_id = " . $cid . "
+//     ORDER BY ass_date DESC;
+//   ";
+//   $dao = CRM_Core_DAO::executeQuery($query);
+//   $result = $dao->fetchAll();
+
+//   if (is_array($result)) {
+//     $template->assign('trgassessments', $result);
+//   } else {
+//     $template->assign('trgassessments', ['is_error' => 1]);
+//   }  
+// }
+
+// function getExternalQualData($cid, &$template) {
+//   // Query to get the current external qualifications and training data
+//   $query = "  
+//     SELECT ov1.label AS extqu_qualtrg_name, cf.extqualtrg_date AS extqu_date, cf.extqualtrg_date_expiry AS extqu_exp_date, cf.extqualtrg_other_detail AS extqu_other_detail  
+//     FROM civicrm_value_external_training_quals cf
+//     INNER JOIN civicrm_option_value ov1
+//     ON cf.extqualtrg_category = ov1.value
+//     AND ov1.option_group_id = 131
+//     WHERE cf.extqualtrg_is_latest_record = 1
+//     AND (cf.extqualtrg_date_expiry IS NULL OR cf.extqualtrg_date_expiry = '0000-00-00 00:00:00' OR cf.extqualtrg_date_expiry > now())
+//     AND cf.entity_id = " . $cid . "
+//     ORDER BY extqu_date DESC;
+//   ";
+//   $dao = CRM_Core_DAO::executeQuery($query);
+//   $result = $dao->fetchAll();
+
+//   if (is_array($result)) {
+//     $template->assign('extQuals', $result);
+//   } else {
+//     $template->assign('extQuals', ['is_error' => 1]);
+//   }  
+// }
+  
+// function getRSHealthData($cid, &$template) {
+//   // Query to get the most recent health assessment 
+//   $query = "
+//     SELECT ov1.label AS ha_category, ov2.label AS ha_result, cf.rshealth_date AS ha_date, cf.rshealth_date_expiry AS ha_exp_date, 
+//       cf.rshealth_conditions AS ha_conditions, cf.rshealth_other_detail as ha_other_detail 
+//     FROM civicrm_value_rail_safety_health cf
+//     INNER JOIN civicrm_option_value ov1
+//     ON cf.rshealth_category = ov1.value
+//     AND ov1.option_group_id = 92
+//     INNER JOIN civicrm_option_value ov2
+//     ON cf.rshealth_fitness = ov2.value
+//     AND ov2.option_group_id = 93
+//     WHERE cf.rshealth_is_latest_record = 1
+//     AND cf.entity_id = " . $cid . "
+//     ORDER BY ha_date DESC
+//     LIMIT 1
+//   ";
+//   $dao = CRM_Core_DAO::executeQuery($query);
+//   $result = $dao->fetchAll();
+
+
+//   // Assign the most recent health assessment details to template variables
+//   if (is_array($result) && array_key_exists(0, $result)) {
+//     $template->assign('health', $result[0]);
+    
+//     // "Decode" the Conditions field checkbox values
+//     if ($result[0]['ha_conditions']) {
+//       $conditionsFieldId = CRM_Core_BAO_CustomField::getCustomFieldID('Conditions', 'Rail_Safety_Health');
+//       $template->assign('ha_conditions', getCustomOptionLabels($result[0]['ha_conditions'], $conditionsFieldId));
+//     }
+//   } else {
+//     $template->assign('health', ['is_error' => 1]);
+//   }
+// }
 
 function getFullName(int $contactId) {
   if ($contactId > 0) {
     try {
-      $result = civicrm_api3('Contact', 'getsingle', array(
+      $result = civicrm_api3('Contact', 'getsingle', [
         'sequential' => 1,
-        'return' => array("first_name", "middle_name", "last_name", "suffix_id"),
+        'return' => ["first_name", "middle_name", "last_name", "suffix_id"],
         'id' => $contactId,
-      ));
+      ]);
       
       if (!empty($result['first_name'])) {
         $name = $result['first_name'];
@@ -256,7 +331,7 @@ function getFullName(int $contactId) {
 
 function getCustomOptionLabels($value, $customFieldId) {
   $customOptions = CRM_Core_BAO_CustomOption::getCustomOption($customFieldId);
-  $returnArray = array();
+  $returnArray = [];
   
   if ($value) {
     $checkedData = explode(CRM_Core_DAO::VALUE_SEPARATOR, substr($value, 1, -1));
@@ -270,9 +345,9 @@ function getCustomOptionLabels($value, $customFieldId) {
 }
 
 function getShortDateFormat() {
-  $result = civicrm_api3('Setting', 'getsingle', array(
-    'return' => array("dateformatshortdate"),
-  ));
+  $result = civicrm_api3('Setting', 'getsingle', [
+    'return' => ["dateformatshortdate"],
+  ]);
   if (is_array($result) && array_key_exists('dateformatshortdate', $result)) {
     return $result['dateformatshortdate'];
   }
