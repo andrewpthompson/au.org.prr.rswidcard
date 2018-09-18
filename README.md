@@ -41,6 +41,10 @@ And edit the path in `extern/rswdata.php` to `civicrm.config.php`:
 require_once '../membership/administrator/components/com_civicrm/civicrm/civicrm.config.php';
 ```
 
+### Configuration
+This extension has a configuration form at **Administer > ID Card settings**. This goes some way to allowing the cards' appearance to be customised to suit other organisations.
+![Screenshot](images/screenshot/screenshot_settings.png)
+
 ## Usage
 
 In CiviCRM, individuals, households and organisations are all called *Contacts*. (Only individuals are relevant to this extension.)
@@ -116,7 +120,7 @@ The below example is from Adobe Reader DC on Windows:
 
 ![Screenshot](images/screenshot/screenshot_adobe_reader_print_dialogue.png)
 
-#### Creating blank ID cards (for temporary issue)
+<!-- #### Creating blank ID cards (for temporary issue)
 
 Due to the logistical problems of creating cards on-site, this feature was requested to permit a sheet of 'blank' cards to be created which would be 
 filled in by hand by a supervisor.
@@ -130,7 +134,7 @@ The conditions under which these temporary cards are permitted to be used have n
 options have no effect.
 
 > **Warning:** Issuing a temporary identity card in no way relieves the organisation of its obligation to meet the legislated requirements 
-for rail safety worker competence and health assessment.
+for rail safety worker competence and health assessment.-->
 
 ### Auditing card issue
 
@@ -212,3 +216,4 @@ The responsible manager suggested that the word 'Safety' be dropped to *'circumv
 These cards are 85 x 54 mm and might be slightly too large after laminating to conveniently fit in a wallet.
 (Avery does sell "self-laminating ID cards" (5361) in the USA, which can be purchased via ebay or Amazon.)
 * The Label Formats and Paper Sizes that are added during installation are not removed when the extension is uninstalled. There is no plan to change this in future.
+* The card layout is fixed, only a PNG image can be used for the logo and only a JPEG can be used for the background. (A future enhancement might be to re-write so that HTML can be used for all of the card layout to permit flexibility. The reason it wasn't done that way originally is that it was felt that precise control over positioning was needed.)
