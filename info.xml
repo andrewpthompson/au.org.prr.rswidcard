@@ -15,8 +15,8 @@
     <email>andrew.thompson@prr.org.au</email>
   </maintainer>
   <urls>
-    <url desc="Main Extension Page"></url>
-    <url desc="Documentation"></url>
+    <url desc="Main Extension Page">https://github.com/andrewpthompson/au.org.prr.rswidcard</url>
+    <url desc="Documentation">https://github.com/andrewpthompson/au.org.prr.rswidcard</url>
     <url desc="Support"></url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
