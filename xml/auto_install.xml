@@ -4,7 +4,7 @@
   <CustomGroups>
     <CustomGroup>
       <name>rsw_id_card</name>
-      <title>Rail Safety Worker ID Card</title>
+      <title>Membership Card</title>
       <extends>Individual</extends>
       <style>Inline</style>
       <collapse_display>1</collapse_display>
@@ -23,7 +23,7 @@
   <CustomFields>
     <CustomField>
       <name>rswid_card_date</name>
-      <label>RSW ID Card Created Date</label>
+      <label>Membership Card Created Date</label>
       <data_type>Date</data_type>
       <html_type>Select Date</html_type>
       <is_required>0</is_required>
@@ -43,7 +43,7 @@
     </CustomField>
     <CustomField>
       <name>rswid_card_hash</name>
-      <label>RSW ID Card Key Hash</label>
+      <label>Membership Card Key Hash</label>
       <data_type>String</data_type>
       <html_type>Text</html_type>
       <is_required>0</is_required>
