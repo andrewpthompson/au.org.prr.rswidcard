@@ -378,13 +378,12 @@ class CRM_RswIdCard_Form_Task_IDCard extends CRM_Contact_Form_Task {
     if (!array_key_exists('blank', $cardData)) {
       $detailText = '<style>p {line-height: normal; margin: 0; padding: 0;}</style>' .
         '<span style="font-size: 9.5pt;">' . $cardData['name'] . '<br /></span>' .
-<<<<<<< HEAD
-        '<span style="font-size: 8pt;">' . E::ts("Member type: ") . $cardData['membership_type'] . '<br /></span>' .
-=======
-        // '<span style="font-size: 8pt;">' . E::ts("Member type: ") . $cardData['membership_type'] . '<br /></span>' .
-        // '<span style="font-size: 8pt;">' . E::ts("Member number: ") . $cardData['external_identifier'] . '<br /></span>' .
->>>>>>> master
-        '<span style="font-size: 8pt;">' . E::ts("Issued: ") . $cardData['card_issue_date_formatted'] . '</span>';
+        '<span style="font-size: 8pt;">' . $cardData['membership_type'];
+      if ($cardData['external_identifier']) {
+        $detailText .= ' No: ' . $cardData['external_identifier'];
+      }
+      $detailText .= '<br /></span>' .
+        '<span style="font-size: 8pt;">' . E::ts("Card issued: ") . $cardData['card_issue_date_formatted'] . '</span>';
     }
     else {
       $detailText = '<span style="font-size: 9.5pt;">Name:<br /></span>
