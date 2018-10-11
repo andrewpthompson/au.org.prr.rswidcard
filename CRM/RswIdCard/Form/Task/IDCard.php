@@ -136,8 +136,9 @@ class CRM_RswIdCard_Form_Task_IDCard extends CRM_Contact_Form_Task {
 
     // Build the returnProperties
     $returnProperties = array(
-      "display_name", "contact_type", "prefix_id", "first_name", "middle_name",
-      "last_name", "image_URL", "$this->cfCardDate", "$this->cfCardHash"
+      "display_name", "contact_type", "external_identifier", "first_name", 
+      "middle_name", "last_name", "image_URL", "$this->cfCardDate",
+      "$this->cfCardHash"
     );
 
     $rows = array();
@@ -329,7 +330,6 @@ class CRM_RswIdCard_Form_Task_IDCard extends CRM_Contact_Form_Task {
 
     $posX = $this->pdf->marginLeft + ($this->pdf->countX * ($this->pdf->width + $this->pdf->xSpace));
     $posY = $this->pdf->marginTop + ($this->pdf->countY * ($this->pdf->height + $this->pdf->ySpace));
-    //$this->pdf->SetXY($posX + $this->pdf->paddingLeft, $posY + $this->pdf->paddingTop);
     // Unlike for mailing labels X and Y origin will not include padding
     $this->pdf->SetXY($posX, $posY);
     $this->labelCreator($contactCardData); // Call custom method instead of CiviCRM's
@@ -357,13 +357,9 @@ class CRM_RswIdCard_Form_Task_IDCard extends CRM_Contact_Form_Task {
     $QRCodeHeight = 0.42 * ($this->pdf->height - $this->pdf->paddingTop * 2 - $gapRows); // = QR code width too
 
     $logoFile = Civi::settings()->get('rswidcard_logo_url');
-    //$logoFile = $this->baseUrl . 'images/PRRPS_logo.png';
-    //$logoFile = $this->baseUrl . 'images/PRRPS_logo_railway_worker.png';
-
     $cardText = Civi::settings()->get('rswidcard_card_text');
     if ($cardText) {
       $titleText = '<p style="text-align: center;">' . $cardText . '</p>';
-      //$titleText = ''; // Text is now incorporated into logo image so this is not required
     }
 
     // Get path of the contact photo file by converting it from the URL.
@@ -382,7 +378,12 @@ class CRM_RswIdCard_Form_Task_IDCard extends CRM_Contact_Form_Task {
     if (!array_key_exists('blank', $cardData)) {
       $detailText = '<style>p {line-height: normal; margin: 0; padding: 0;}</style>' .
         '<span style="font-size: 9.5pt;">' . $cardData['name'] . '<br /></span>' .
+<<<<<<< HEAD
         '<span style="font-size: 8pt;">' . E::ts("Member type: ") . $cardData['membership_type'] . '<br /></span>' .
+=======
+        // '<span style="font-size: 8pt;">' . E::ts("Member type: ") . $cardData['membership_type'] . '<br /></span>' .
+        // '<span style="font-size: 8pt;">' . E::ts("Member number: ") . $cardData['external_identifier'] . '<br /></span>' .
+>>>>>>> master
         '<span style="font-size: 8pt;">' . E::ts("Issued: ") . $cardData['card_issue_date_formatted'] . '</span>';
     }
     else {
@@ -479,7 +480,6 @@ class CRM_RswIdCard_Form_Task_IDCard extends CRM_Contact_Form_Task {
       $photo = file_get_contents($photoFile);
       // Centre the (uncropped) image
       $this->pdf->Image('@' . $photo, $x + $this->pdf->width - $this->pdf->paddingLeft - $photoUncroppedWidth + ($photoUncroppedWidth - $photoWidth) / 2, $y + $this->pdf->paddingTop - ($photoUncroppedHeight - $photoHeight) / 2, $photoUncroppedWidth, $photoUncroppedHeight, '', true, '', true, 300);
-      //$this->pdf->Image($photoFile, $x + $this->pdf->width - $this->pdf->paddingLeft - $photoUncroppedWidth + ($photoUncroppedWidth-$photoWidth)/2, $y + $this->pdf->paddingTop - ($photoUncroppedHeight-$photoHeight)/2, $photoUncroppedWidth, $photoUncroppedHeight, '', true, '', true, 300);
       $this->pdf->StopTransform();
     }
 
