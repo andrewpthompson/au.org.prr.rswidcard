@@ -215,7 +215,7 @@ class CRM_RswIdCard_Form_Task_IDCard extends CRM_Contact_Form_Task {
           $activityIds = CRM_RswIdCard_Form_Task_IDCardCommon::createActivities($this, $contactIds, $formTitle . E::ts(' created'), 'rsw_id_card_created');
         }
       }
-      CRM_Utils_System::civiExit(1);
+      CRM_Utils_System::civiExit();
     }
     else {
       // Display info message if there were no cards created
