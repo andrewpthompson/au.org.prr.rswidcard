@@ -235,8 +235,3 @@ function rswidcard_civicrm_pageRun(&$page) {
     CRM_Core_Resources::singleton()->addScriptFile('au.org.prr.rswidcard', 'js/hideKeyField.js');
   }
 }
-
-// TESTING
-function rswidcard_civicrm_alterTemplateFile($formName, &$form, $context, &$tplName) {
-  //print_r("Form: $formName, Template: $tplName\n");
-}
