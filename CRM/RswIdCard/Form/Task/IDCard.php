@@ -215,7 +215,7 @@ class CRM_RswIdCard_Form_Task_IDCard extends CRM_Contact_Form_Task {
           $activityIds = CRM_RswIdCard_Form_Task_IDCardCommon::createActivities($this, $contactIds, $formTitle . E::ts(' created'), 'rsw_id_card_created');
         }
       }
-      CRM_Utils_System::civiExit(1);
+      CRM_Utils_System::civiExit();
     }
     else {
       // Display info message if there were no cards created
@@ -462,7 +462,9 @@ class CRM_RswIdCard_Form_Task_IDCard extends CRM_Contact_Form_Task {
       $this->pdf->writeHTMLCell($col1Width, $textRSWHeight, $x + $this->pdf->paddingLeft, $this->pdf->paddingTop + $logoHeight + $y, $titleText);
     }
 
-    $this->pdf->Image($logoFile, $x + $this->pdf->paddingLeft + ($col1Width - $logoWidth) / 2, $y + $this->pdf->paddingTop, $logoWidth, $logoHeight, $type = '', $link = '', $align = '', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = true, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+    if ($logoFile) {
+      $this->pdf->Image($logoFile, $x + $this->pdf->paddingLeft + ($col1Width - $logoWidth) / 2, $y + $this->pdf->paddingTop, $logoWidth, $logoHeight, $type = '', $link = '', $align = '', $resize = false, $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = true, $hidden = false, $fitonpage = false, $alt = false, $altimgs = array());
+    }
 
     if ($photoFile) {
       // If the contact image is not of the correct aspect ratio it will be cropped using a clipping mask in TCPDF
