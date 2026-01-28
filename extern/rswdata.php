@@ -3,6 +3,12 @@
 // Edit the below line with the correct path to CiviCRM
 require_once '../membership/administrator/components/com_civicrm/civicrm/civicrm.config.php';
 
+// The following 3 require_once lines are a temporary workaround. While the Joomla 5 version of CiviCRM does not include
+// PSR Log (due to it conflicting with Joomla's), manually load the PSR Log files from Joomla's libraries/vendor directory
+require_once '../membership/libraries/vendor/psr/log/src/LoggerTrait.php';
+require_once '../membership/libraries/vendor/psr/log/src/LoggerInterface.php';
+require_once '../membership/libraries/vendor/psr/log/src/AbstractLogger.php';
+
 require_once 'CRM/Core/Config.php';
 $config = CRM_Core_Config::singleton();
 $res = CRM_Core_Resources::singleton();
