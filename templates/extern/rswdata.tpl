@@ -42,7 +42,7 @@
               </div>
               <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
                 <div class="card-body">
-                    {if $approvals.is_error eq 1 or $approvals|@count eq 0}
+                    {if (isset($approvals.is_error) && $approvals.is_error == 1) or $approvals|count == 0}
                       <p>No record</p>
                     {else}
                       <p>The worker is approved to work in the roles that are listed below.</p>
@@ -79,7 +79,7 @@
               </div>
               <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
                 <div class="card-body">
-                    {if $trgassessments.is_error eq 1 or $trgassessments|@count eq 0}
+                    {if (isset($trgassessments.is_error) && $trgassessments.is_error == 1) or $trgassessments|count == 0}
                       <p>No record</p>
                     {else}
                       <div class="table-responsive">
@@ -117,7 +117,7 @@
               </div>
               <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordion">
                 <div class="card-body">
-                    {if $extQuals.is_error eq 1 or $extQuals|@count eq 0}
+                    {if (isset($extQuals.is_error) && $extQuals.is_error == 1) or $extQuals|count == 0}
                       <p>No record</p>
                     {else}
                       <div class="table-responsive">
@@ -155,7 +155,7 @@
               </div>
               <div id="collapseFour" class="collapse" aria-labelledby="headingFour" data-parent="#accordion">
                 <div class="card-body">
-                    {if $health.is_error eq 1}
+                    {if (isset($health.is_error) && $health.is_error == 1) or $health|count == 0}
                       <p>No record</p>
                     {else}
                       <p><b>Risk category:</b> {$health.ha_category}</p>
