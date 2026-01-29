@@ -79,23 +79,28 @@ $template->display($extTplPath. "/extern/rswdata.tpl");
 // Finished.
 
 function validateKey($cid, $key) {
-  if ($cid && $key) {
-    // Get name of key hash custom field
-    $cfCardHash = "custom_" . CRM_Core_BAO_CustomField::getCustomFieldID('rswid_card_hash', 'rsw_id_card');
+  // Name of card hash custom field
+  $cfCardHash = 'rsw_id_card.rswid_card_hash';
     
+  if ($cid && $key) {
     // Get contact's key hash from database and validate it
     try {
-      $result = civicrm_api3('Contact', 'getsingle', array(
-        'sequential' => 1,
-        'return' => array("$cfCardHash"),
-        'id' => $cid,
-      ));
-      $keyHash = $result[$cfCardHash];
+      // API 4 query to retrieve the contact's card hash
+      $contact = \Civi\Api4\Contact::get(FALSE)
+        ->addSelect($cfCardHash)
+        ->addWhere('id', '=', $cid)
+        ->setLimit(1)
+        ->execute()
+        ->first();
+
+      $keyHash = $contact[$cfCardHash];
+      
+      // Verify the supplied key (from QR code) against the hash using PHP's password_verify() function
       if (strlen($keyHash) > 20 && password_verify($key, $keyHash)) {
         return true;
       }
     }
-    catch (CiviCRM_API3_Exception $e) {
+    catch (\API_Exception $e) {
       // do nothing
     }
   }
@@ -225,38 +230,30 @@ function getRSHealthData($cid, &$template) {
   }
 }
 
-function getFullName(int $contactId) {
-  if ($contactId > 0) {
+function getFullName(int $cid) {
+  if ($cid > 0) {
+    // Get the contact's name using api4
     try {
-      $result = civicrm_api3('Contact', 'getsingle', array(
-        'sequential' => 1,
-        'return' => array("first_name", "middle_name", "last_name", "suffix_id"),
-        'id' => $contactId,
-      ));
+      $contact = \Civi\Api4\Contact::get(FALSE)
+        ->addSelect('display_name')
+        ->addWhere('id', '=', $cid)
+        ->setLimit(1)
+        ->execute()
+        ->first();
       
-      if (!empty($result['first_name'])) {
-        $name = $result['first_name'];
+      if (!$contact) {
+        echo ts("Contact does not exist.");
+        exit;
       }
-      if (!empty($result['middle_name'])) {
-        $name .= " " . $result['middle_name'];
+      else {
+        return $contact['display_name'];
       }
-      if (!empty($result['last_name'])) {
-        $name .= " " . $result['last_name'];
-      }
-      if (!empty($result['individual_suffix'])) {
-        $name .= " " . $result['individual_suffix'];
-      }
-
-      return $name;
+    
     }
-    catch (CiviCRM_API3_Exception $e) {
-      echo ts('Contact does not exist.');
+    catch (\API_Exception $e) {
+      echo ts("Error retrieving contact's details.");
       exit;
     }
-  }
-  else {
-    echo ts('Contact does not exist.');
-    exit;
   }
 }
 
@@ -276,11 +273,18 @@ function getCustomOptionLabels($value, $customFieldId) {
 }
 
 function getShortDateFormat() {
-  $result = civicrm_api3('Setting', 'getsingle', array(
-    'return' => array("dateformatshortdate"),
-  ));
-  if (is_array($result) && array_key_exists('dateformatshortdate', $result)) {
-    return $result['dateformatshortdate'];
+  try {
+    $setting = \Civi\Api4\Setting::get(FALSE)
+    ->addSelect('dateformatshortdate')
+    ->execute()
+    ->first();
+  }
+  catch (\API_Exception $e) {
+    CRM_Core_Error::fatal(ts('Could not retrieve CiviCRM short date format setting.'));
+  }
+
+  if (is_array($setting) && array_key_exists('value', $setting)) {
+    return $setting['value'];
   }
   else {
     CRM_Core_Error::fatal(ts('Could not retrieve CiviCRM short date format setting.'));
