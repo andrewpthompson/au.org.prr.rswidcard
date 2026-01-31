@@ -57,9 +57,9 @@
                           </thead>
                           {foreach from=$approvals item=approval}
                             <tr>
-                              <td>{$approval.app_approval_name}</td>
-                              {* <td>{$approval.app_date|date_format:$dateFormat}</td> *}
-                              <td>{$approval.app_other_detail}</td>
+                              <td>{$approval["Approval:label"]}</td>
+                              {* <td>{$approval.Date|date_format:$dateFormat}</td> *}
+                              <td>{$approval.Other_detail}</td>
                             </tr>
                           {/foreach}
                         </table>
@@ -94,10 +94,10 @@
                           </thead>
                           {foreach from=$trgassessments item=trgassessment}
                             <tr>
-                              {* <td>{$trgassessment.ass_record_type}</td> *}
-                              <td>{$trgassessment.ass_trg_assess_name}</td>
-                              <td>{$trgassessment.ass_date|date_format:$dateFormat}</td>
-                              <td>{$trgassessment.ass_other_detail}</td>
+                              {* <td>{$trgassessment["Record_type:label"]}</td> *}
+                              <td>{$trgassessment["Assessment_or_training_name:label"]}</td>
+                              <td>{$trgassessment.Date|date_format:$dateFormat}</td>
+                              <td>{$trgassessment.Other_detail}</td>
                             </tr>
                           {/foreach}
                       </table>
@@ -132,10 +132,10 @@
                           </thead>
                           {foreach from=$extQuals item=extQual}
                             <tr>
-                              <td>{$extQual.extqu_qualtrg_name}</td>
-                              {* <td>{$extQual.extqu_date|date_format:$dateFormat}</td> *}
-                              <td>{$extQual.extqu_exp_date|date_format:$dateFormat}</td>
-                              <td>{$extQual.extqu_other_detail}</td>
+                              <td>{$extQual["Name_of_training_qualification:label"]}</td>
+                              {* <td>{$extQual.Date|date_format:$dateFormat}</td> *}
+                              <td>{$extQual.Expiry_date|date_format:$dateFormat}</td>
+                              <td>{$extQual.Other_detail}</td>
                             </tr>
                           {/foreach}
                         </table>
@@ -158,16 +158,16 @@
                     {if (isset($health.is_error) && $health.is_error == 1) or $health|count == 0}
                       <p>No record</p>
                     {else}
-                      <p><b>Risk category:</b> {$health.ha_category}</p>
-                      <p><b>Expiry date:</b> {$health.ha_exp_date|date_format:$dateFormat}</p>
-                      <p><b>Fitness for duty categorisation:</b> {$health.ha_result}</p>
-                      {if !empty($health.ha_conditions)}
+                      <p><b>Risk category:</b> {$health["Category:label"]}</p>
+                      <p><b>Expiry date:</b> {$health.Expiry_date|date_format:$dateFormat}</p>
+                      <p><b>Fitness for duty categorisation:</b> {$health["Health_assessment_result:label"]}</p>
+                      {if !empty($health["Conditions:label"])}
                       <p><b>Conditions:</b><br />
-                        {foreach from=$ha_conditions item=condition}
+                        {foreach from=$health["Conditions:label"] item=condition}
                           {$condition}<br />
                         {/foreach}
                       {/if}</p>
-                      {if !empty($health.ha_other_detail)}<p><b>Other detail:</b> {$health.ha_other_detail}</p>{/if}
+                      {if !empty($health.Other_detail)}<p><b>Other detail:</b> {$health.Other_detail}</p>{/if}
                     {/if}
                 </div>
               </div>

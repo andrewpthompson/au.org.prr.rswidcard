@@ -100,7 +100,7 @@ function validateKey($cid, $key) {
         return true;
       }
     }
-    catch (\API_Exception $e) {
+    catch (\CRM_Core_Exception $e) {
       // do nothing
     }
   }
@@ -118,121 +118,84 @@ function getRSWData($cid, &$template) {
 }
 
 function getApprovalsData($cid, &$template) {
-  // Query to get the current PRRPS approvals
-  $query = "  
-    SELECT ov1.label AS app_approval_name, cf.prrapprov_date AS app_date, cf.prrapprov_date_expiry AS app_exp_date, cf.prrapprov_other_detail AS app_other_detail  
-    FROM civicrm_value_prrps_approvals cf
-    INNER JOIN civicrm_option_value ov1
-    ON cf.prrapprov_category = ov1.value
-    AND ov1.option_group_id = 98
-    WHERE cf.prrapprov_is_latest_record = 1
-    AND cf.prrapprov_is_withdrawn = 0
-    AND (cf.prrapprov_date_expiry IS NULL OR cf.prrapprov_date_expiry = '0000-00-00 00:00:00' OR cf.prrapprov_date_expiry > now())
-    AND cf.entity_id = " . $cid . "
-    ORDER BY app_date DESC;
-  ";
-  $dao = CRM_Core_DAO::executeQuery($query);
-  $result = $dao->fetchAll();
-
-  if (is_array($result)) {
-    $template->assign('approvals', $result);
-  } else {
+  // APIv4 query to get the current PRRPS approvals
+  try {
+    $approvals = \Civi\Api4\CustomValue::get('PRRPS_Approvals', FALSE)
+      ->addSelect('Approval:label', 'Date', 'Expiry_date', 'Other_detail')
+      ->addWhere('entity_id', '=', $cid)
+      ->addWhere('Is_latest_record', '=', TRUE)
+      ->addWhere('Approval_withdrawn', '=', FALSE)
+      ->addClause('OR', ['Expiry_date', 'IS NULL'], ['Expiry_date', '>=', 'now'])
+      ->addOrderBy('Approval:label', 'ASC')
+      ->addOrderBy('Date', 'DESC')
+      ->execute();
+    
+    $template->assign('approvals', $approvals);
+  }
+  catch (\CRM_Core_Exception $e) {
     $template->assign('approvals', array('is_error' => 1));
-  }  
+  }
 }
 
 function getTrainingAssessData($cid, &$template) {
-  // Query to get the current PRRPS training and assessments
-  $query = "  
-    SELECT ov1.label AS ass_trg_assess_name, ov2.label AS ass_record_type, cf.prrasstrg_date AS ass_date, 
-      cf.prrasstrg_date_expiry AS ass_exp_date, cf.prrasstrg_other_detail AS ass_other_detail  
-    FROM civicrm_value_prrps_assessments_training AS cf
-    INNER JOIN civicrm_option_value AS ov1
-    ON cf.prrasstrg_category = ov1.value
-    AND ov1.option_group_id = 100
-    INNER JOIN civicrm_option_value ov2
-    ON cf.prrasstrg_record_type = ov2.value
-    AND ov2.option_group_id = 99
-    INNER JOIN civicrm_option_value ov3
-    ON cf.prrasstrg_assessment_result = ov3.value
-    AND ov3.option_group_id = 101
-    WHERE cf.prrasstrg_is_latest_record = 1
-    AND (cf.prrasstrg_date_expiry IS NULL OR cf.prrasstrg_date_expiry = '0000-00-00 00:00:00' OR cf.prrasstrg_date_expiry > now())
-    AND cf.prrasstrg_assessment_result <> '2' -- 2 = Not yet competent
-    AND cf.entity_id = " . $cid . "
-    ORDER BY ass_date DESC;
-  ";
-  $dao = CRM_Core_DAO::executeQuery($query);
-  $result = $dao->fetchAll();
-
-  if (is_array($result)) {
-    $template->assign('trgassessments', $result);
-  } else {
+  // APIv4 query to get the current PRRPS training and assessments
+  try {
+    $trgassessments = \Civi\Api4\CustomValue::get('PRRPS_Assessments_Training', FALSE)
+      ->addSelect('Assessment_or_training_name:label', 'Record_type:label', 'Date', 'Expiry_date', 'Other_detail')
+      ->addWhere('entity_id', '=', $cid)
+      ->addWhere('Is_latest_record', '=', TRUE)
+      ->addWhere('Assessment_result', 'NOT IN', [2, 5]) // 2 == 'Not yet competent', 5 == 'Insufficient evidence of competence'. (WTF is the difference?)
+      ->addClause('OR', ['Expiry_date', 'IS NULL'], ['Expiry_date', '>=', 'now'])
+      ->addOrderBy('Assessment_or_training_name:label', 'ASC')
+      ->addOrderBy('Date', 'DESC')
+      ->execute();
+    
+    $template->assign('trgassessments', $trgassessments);
+  }
+  catch (\CRM_Core_Exception $e) {
     $template->assign('trgassessments', array('is_error' => 1));
-  }  
+  }
 }
 
 function getExternalQualData($cid, &$template) {
-  // Query to get the current external qualifications and training data
-  $query = "  
-    SELECT ov1.label AS extqu_qualtrg_name, cf.extqualtrg_date AS extqu_date, cf.extqualtrg_date_expiry AS extqu_exp_date, cf.extqualtrg_other_detail AS extqu_other_detail  
-    FROM civicrm_value_external_training_quals cf
-    INNER JOIN civicrm_option_value ov1
-    ON cf.extqualtrg_category = ov1.value
-    AND ov1.option_group_id = 131
-    WHERE cf.extqualtrg_is_latest_record = 1
-    AND (cf.extqualtrg_date_expiry IS NULL OR cf.extqualtrg_date_expiry = '0000-00-00 00:00:00' OR cf.extqualtrg_date_expiry > now())
-    AND cf.entity_id = " . $cid . "
-    ORDER BY extqu_date DESC;
-  ";
-  $dao = CRM_Core_DAO::executeQuery($query);
-  $result = $dao->fetchAll();
-
-  if (is_array($result)) {
-    $template->assign('extQuals', $result);
-  } else {
+  // APIv4 query to get the current external qualifications and training data
+  try {
+    $extQuals = \Civi\Api4\CustomValue::get('External_Training_Qualifications', FALSE)
+      ->addSelect('Name_of_training_qualification:label', 'Date', 'Expiry_date', 'Other_detail')
+      ->addWhere('entity_id', '=', $cid)
+      ->addWhere('Is_latest_record', '=', TRUE)
+      ->addClause('OR', ['Expiry_date', 'IS NULL'], ['Expiry_date', '>=', 'now'])
+      ->addOrderBy('Name_of_training_qualification:label', 'ASC')
+      ->addOrderBy('Date', 'DESC')
+      ->execute();
+    
+    $template->assign('extQuals', $extQuals);
+  }
+  catch (\CRM_Core_Exception $e) {
     $template->assign('extQuals', array('is_error' => 1));
-  }  
+  }
 }
   
 function getRSHealthData($cid, &$template) {
-  // Query to get the most recent health assessment 
-  $query = "
-    SELECT ov1.label AS ha_category, ov2.label AS ha_result, cf.rshealth_date AS ha_date, cf.rshealth_date_expiry AS ha_exp_date, 
-      cf.rshealth_conditions AS ha_conditions, cf.rshealth_other_detail as ha_other_detail 
-    FROM civicrm_value_rail_safety_health cf
-    INNER JOIN civicrm_option_value ov1
-    ON cf.rshealth_category = ov1.value
-    AND ov1.option_group_id = 92
-    INNER JOIN civicrm_option_value ov2
-    ON cf.rshealth_fitness = ov2.value
-    AND ov2.option_group_id = 93
-    WHERE cf.rshealth_is_latest_record = 1
-    AND cf.entity_id = " . $cid . "
-    ORDER BY ha_date DESC
-    LIMIT 1
-  ";
-  $dao = CRM_Core_DAO::executeQuery($query);
-  $result = $dao->fetchAll();
-
-
-  // Assign the most recent health assessment details to template variables
-  if (is_array($result) && array_key_exists(0, $result)) {
-    $template->assign('health', $result[0]);
+  // APIv4 query to get the most recent health assessment
+  try {
+    $health = \Civi\Api4\CustomValue::get('Rail_Safety_Health', FALSE)
+      ->addSelect('Category:label', 'Health_assessment_result:label', 'Date', 'Expiry_date', 'Conditions:label', 'Other_detail')
+      ->addWhere('entity_id', '=', $cid)
+      ->addWhere('Is_latest_record', '=', TRUE)
+      ->execute()
+      ->first();
     
-    // "Decode" the Conditions field checkbox values
-    if ($result[0]['ha_conditions']) {
-      $conditionsFieldId = CRM_Core_BAO_CustomField::getCustomFieldID('Conditions', 'Rail_Safety_Health');
-      $template->assign('ha_conditions', getCustomOptionLabels($result[0]['ha_conditions'], $conditionsFieldId));
-    }
-  } else {
+    $template->assign('health', $health);
+  }
+  catch (\CRM_Core_Exception $e) {
     $template->assign('health', array('is_error' => 1));
   }
 }
 
 function getFullName(int $cid) {
   if ($cid > 0) {
-    // Get the contact's name using api4
+    // Get the contact's name using APIv4
     try {
       $contact = \Civi\Api4\Contact::get(FALSE)
         ->addSelect('display_name')
@@ -241,35 +204,13 @@ function getFullName(int $cid) {
         ->execute()
         ->first();
       
-      if (!$contact) {
-        echo ts("Contact does not exist.");
-        exit;
-      }
-      else {
-        return $contact['display_name'];
-      }
-    
+      return $contact['display_name'];
     }
-    catch (\API_Exception $e) {
+    catch (\CRM_Core_Exception $e) {
       echo ts("Error retrieving contact's details.");
       exit;
     }
   }
-}
-
-function getCustomOptionLabels($value, $customFieldId) {
-  $customOptions = CRM_Core_BAO_CustomOption::getCustomOption($customFieldId);
-  $returnArray = array();
-  
-  if ($value) {
-    $checkedData = explode(CRM_Core_DAO::VALUE_SEPARATOR, substr($value, 1, -1));
-    foreach ($customOptions as $option) {
-      if (in_array($option['value'], $checkedData)) {
-        $returnArray[] = $option['label'] . "\n";
-      }
-    }
-  }
-  return $returnArray;
 }
 
 function getShortDateFormat() {
@@ -278,15 +219,10 @@ function getShortDateFormat() {
     ->addSelect('dateformatshortdate')
     ->execute()
     ->first();
-  }
-  catch (\API_Exception $e) {
-    CRM_Core_Error::fatal(ts('Could not retrieve CiviCRM short date format setting.'));
-  }
 
-  if (is_array($setting) && array_key_exists('value', $setting)) {
     return $setting['value'];
   }
-  else {
+  catch (\CRM_Core_Exception $e) {
     CRM_Core_Error::fatal(ts('Could not retrieve CiviCRM short date format setting.'));
   }
 }
