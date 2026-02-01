@@ -35,7 +35,7 @@ Presently this does not work on Drupal (TO DO, needs a bit of extra code to boot
 
 Edit `index.php` with the location of the extension (actually this file is only this one line):
 ```php
-require_once '../membership/media/civicrm/ext/au.org.prr.rswidcard/extern/rswdata.php';
+require_once '../joomlasubdir/media/civicrm/ext/au.org.prr.rswidcard/extern/rswdata.php';
 ```
 Copy/rename `extern/config.dist.php` to `extern/config.local.php`. Edit it to provide the full path to `civicrm.config.php` and the CMS (joomla|drupal|wp).
 
