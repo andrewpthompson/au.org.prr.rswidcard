@@ -34,7 +34,7 @@ $res = CRM_Core_Resources::singleton();
 $dateFormat = getShortDateFormat();
 
 // Load Google ReCAPTCHA library
-$recaptchaBase = dirname(__FILE__).'/../packages/recaptcha';
+$recaptchaBase = dirname(__FILE__).'/../packages/ReCaptcha';
 require_once $recaptchaBase . '/ReCaptcha.php';
 require_once $recaptchaBase . '/RequestMethod.php';
 require_once $recaptchaBase . '/RequestParameters.php';
