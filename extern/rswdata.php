@@ -1,21 +1,34 @@
 <?php
+/* External (to CiviCRM) portion of the RSW ID Card extension. This provides a CMS-independent web page that is accessed
+ * using the ID card's QR code.
+ * 
+ +--------------------------------------------------------------------+
+ | Copyright Andrew Thompson. All rights reserved.                    |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty.                     |
+ +--------------------------------------------------------------------+
+ *
+ */
+
+// Load config file. This includes the path to the CiviCRM config file and the CMS type.
+$rsw_config = require __DIR__ . '/config.local.php';
+
 // Perform bootstrap of CiviCRM
-// Edit the below line with the correct path to CiviCRM
-require_once '../membership/administrator/components/com_civicrm/civicrm/civicrm.config.php';
+// Load the CiviCRM config file (path is specified in this extension's own config file)
+require_once $rsw_config['civicrm_config_file'];
 
 // The following 3 require_once lines are a temporary workaround. While the Joomla 5 version of CiviCRM does not include
 // PSR Log (due to it conflicting with Joomla's), manually load the PSR Log files from Joomla's libraries/vendor directory
-require_once '../membership/libraries/vendor/psr/log/src/LoggerTrait.php';
-require_once '../membership/libraries/vendor/psr/log/src/LoggerInterface.php';
-require_once '../membership/libraries/vendor/psr/log/src/AbstractLogger.php';
+if ($rsw_config['cms'] == "joomla") {
+  require_once $rsw_config['cms_root'] . '/libraries/vendor/psr/log/src/LoggerTrait.php';
+  require_once $rsw_config['cms_root'] . '/libraries/vendor/psr/log/src/LoggerInterface.php';
+  require_once $rsw_config['cms_root'] . '/libraries/vendor/psr/log/src/AbstractLogger.php';
+}
 
 require_once 'CRM/Core/Config.php';
 $config = CRM_Core_Config::singleton();
 $res = CRM_Core_Resources::singleton();
-
-if (defined('PANTHEON_ENVIRONMENT')) {
-  ini_set('session.save_handler', 'files');
-}
 
 // Get CiviCRM's short date format
 $dateFormat = getShortDateFormat();
@@ -42,6 +55,15 @@ $_SESSION['cid'] = $cid = CRM_Utils_Request::retrieve('c', 'Positive');
 $_SESSION['key'] = $key = CRM_Utils_Request::retrieve('k', 'String');
 $recaptchaResponse = CRM_Utils_Request::retrieve('g-recaptcha-response', 'String');
 
+$orgName = getOrganisationName();
+
+$pageTitle = "$orgName &ndash; Member data";
+$mainHeading = $orgName;
+// PRRPS-specific: use "Railway worker data" in title
+if (str_contains($orgName, "Pichi Richi Railway Preservation Society")) {
+  $pageTitle = "Pichi Richi Railway Preservation Society &ndash; Railway worker data";
+}
+
 // Controller for the reCAPTCHA form
 // Ensure that reCAPTCHA public and private keys are set in CiviCRM settings
 if (empty($config->recaptchaPublicKey) || empty($config->recaptchaPrivateKey)) {
@@ -53,11 +75,39 @@ elseif (isset($recaptchaResponse)) {
   $resp = $recaptcha->verify($recaptchaResponse, $_SERVER['REMOTE_ADDR']);
   
   if ($resp->isSuccess()) {
-    if (validateKey($cid, $key) === true) {
-      getRSWData($cid, $template);
+    // Successful reCAPTCHA response
+    // This section is the main code that queries for and then outputs (via a template) the records and data to be shown.
+    $mainHeading = "Member data";
+    $contact = getContactData($cid);
+    $keyHash = $contact['rsw_id_card.rswid_card_hash'] ?? NULL;
+    $fullName = $contact['display_name'] ?? NULL;
+
+    if (validateKey($key, $keyHash) === true) {
+      // Get contact's full name and assign to a template variable
+      $template->assign('fullName', $fullName);
+
+      // Get membership data and assign to template
+      $template->assign('membership', getMembershipData($cid));
+      
+      // Specific to PRRPS
+      // Get approvals, rail safety health assessments, training and assessments, and external qualifications records and assign to template.
+      if (str_contains($orgName, "Pichi Richi Railway Preservation Society")) {
+        $template->assign('approvals', getApprovalsData($cid));
+        $template->assign('health', getRSHealthData($cid));
+        $template->assign('trgassessments', getTrainingAssessData($cid));
+        $template->assign('extQuals', getExternalQualData($cid));
+        // Specific heading for PRRPS
+        $mainHeading = "Railway worker data";
+      }
+
+      // Specific to Phoenix Aero Club
+      // Get licence and medical data and assign to template.
+      if (str_contains($orgName, "Phoenix Aero")) {
+        $template->assign('licenceAndMedical', getLicenceMedicalData($cid));
+      }
     }
     else {
-      $template->assign('errMsg', "The QR code was read incorrectly, the identity card has been de-activated, or no record was found for the worker. Try re-scanning the QR code.");
+      $template->assign('errMsg', "The QR code was read incorrectly, the identity card has been de-activated, or no record was found for the worker.");
     }
   }
   else {
@@ -78,141 +128,7 @@ $template->display($extTplPath. "/extern/rswdata.tpl");
 
 // Finished.
 
-function validateKey($cid, $key) {
-  // Name of card hash custom field
-  $cfCardHash = 'rsw_id_card.rswid_card_hash';
-    
-  if ($cid && $key) {
-    // Get contact's key hash from database and validate it
-    try {
-      // API 4 query to retrieve the contact's card hash
-      $contact = \Civi\Api4\Contact::get(FALSE)
-        ->addSelect($cfCardHash)
-        ->addWhere('id', '=', $cid)
-        ->setLimit(1)
-        ->execute()
-        ->first();
-
-      $keyHash = $contact[$cfCardHash];
-      
-      // Verify the supplied key (from QR code) against the hash using PHP's password_verify() function
-      if (strlen($keyHash) > 20 && password_verify($key, $keyHash)) {
-        return true;
-      }
-    }
-    catch (\CRM_Core_Exception $e) {
-      // do nothing
-    }
-  }
-  return false;
-}
-
-function getRSWData($cid, &$template) {
-  // Get contact's full name and assign to a template variable
-  $template->assign('fullName', getFullName($cid));
-
-  getRSHealthData($cid, $template);
-  getApprovalsData($cid, $template);
-  getTrainingAssessData($cid, $template);
-  getExternalQualData($cid, $template);
-}
-
-function getApprovalsData($cid, &$template) {
-  // APIv4 query to get the current PRRPS approvals
-  try {
-    $approvals = \Civi\Api4\CustomValue::get('PRRPS_Approvals', FALSE)
-      ->addSelect('Approval:label', 'Date', 'Expiry_date', 'Other_detail')
-      ->addWhere('entity_id', '=', $cid)
-      ->addWhere('Is_latest_record', '=', TRUE)
-      ->addWhere('Approval_withdrawn', '=', FALSE)
-      ->addClause('OR', ['Expiry_date', 'IS NULL'], ['Expiry_date', '>=', 'now'])
-      ->addOrderBy('Approval:label', 'ASC')
-      ->addOrderBy('Date', 'DESC')
-      ->execute();
-    
-    $template->assign('approvals', $approvals);
-  }
-  catch (\CRM_Core_Exception $e) {
-    $template->assign('approvals', array('is_error' => 1));
-  }
-}
-
-function getTrainingAssessData($cid, &$template) {
-  // APIv4 query to get the current PRRPS training and assessments
-  try {
-    $trgassessments = \Civi\Api4\CustomValue::get('PRRPS_Assessments_Training', FALSE)
-      ->addSelect('Assessment_or_training_name:label', 'Record_type:label', 'Date', 'Expiry_date', 'Other_detail')
-      ->addWhere('entity_id', '=', $cid)
-      ->addWhere('Is_latest_record', '=', TRUE)
-      ->addWhere('Assessment_result', 'NOT IN', [2, 5]) // 2 == 'Not yet competent', 5 == 'Insufficient evidence of competence'. (WTF is the difference?)
-      ->addClause('OR', ['Expiry_date', 'IS NULL'], ['Expiry_date', '>=', 'now'])
-      ->addOrderBy('Assessment_or_training_name:label', 'ASC')
-      ->addOrderBy('Date', 'DESC')
-      ->execute();
-    
-    $template->assign('trgassessments', $trgassessments);
-  }
-  catch (\CRM_Core_Exception $e) {
-    $template->assign('trgassessments', array('is_error' => 1));
-  }
-}
-
-function getExternalQualData($cid, &$template) {
-  // APIv4 query to get the current external qualifications and training data
-  try {
-    $extQuals = \Civi\Api4\CustomValue::get('External_Training_Qualifications', FALSE)
-      ->addSelect('Name_of_training_qualification:label', 'Date', 'Expiry_date', 'Other_detail')
-      ->addWhere('entity_id', '=', $cid)
-      ->addWhere('Is_latest_record', '=', TRUE)
-      ->addClause('OR', ['Expiry_date', 'IS NULL'], ['Expiry_date', '>=', 'now'])
-      ->addOrderBy('Name_of_training_qualification:label', 'ASC')
-      ->addOrderBy('Date', 'DESC')
-      ->execute();
-    
-    $template->assign('extQuals', $extQuals);
-  }
-  catch (\CRM_Core_Exception $e) {
-    $template->assign('extQuals', array('is_error' => 1));
-  }
-}
-  
-function getRSHealthData($cid, &$template) {
-  // APIv4 query to get the most recent health assessment
-  try {
-    $health = \Civi\Api4\CustomValue::get('Rail_Safety_Health', FALSE)
-      ->addSelect('Category:label', 'Health_assessment_result:label', 'Date', 'Expiry_date', 'Conditions:label', 'Other_detail')
-      ->addWhere('entity_id', '=', $cid)
-      ->addWhere('Is_latest_record', '=', TRUE)
-      ->execute()
-      ->first();
-    
-    $template->assign('health', $health);
-  }
-  catch (\CRM_Core_Exception $e) {
-    $template->assign('health', array('is_error' => 1));
-  }
-}
-
-function getFullName(int $cid) {
-  if ($cid > 0) {
-    // Get the contact's name using APIv4
-    try {
-      $contact = \Civi\Api4\Contact::get(FALSE)
-        ->addSelect('display_name')
-        ->addWhere('id', '=', $cid)
-        ->setLimit(1)
-        ->execute()
-        ->first();
-      
-      return $contact['display_name'];
-    }
-    catch (\CRM_Core_Exception $e) {
-      echo ts("Error retrieving contact's details.");
-      exit;
-    }
-  }
-}
-
+// Get CiviCRM's short date format from settings using APIv4
 function getShortDateFormat() {
   try {
     $setting = \Civi\Api4\Setting::get(FALSE)
@@ -222,8 +138,149 @@ function getShortDateFormat() {
 
     return $setting['value'];
   }
-  catch (\CRM_Core_Exception $e) {
+  catch (\API_Exception $e) {
     CRM_Core_Error::fatal(ts('Could not retrieve CiviCRM short date format setting.'));
+  }
+}
+
+function getOrganisationName() {
+  try {
+    $domain = \Civi\Api4\Domain::get(FALSE)
+      ->addSelect('name')
+      ->execute()
+      ->first();
+    
+    return $domain["name"];
+  }
+  catch (\API_Exception $e) {
+    return NULL;
+  }
+}
+
+// Verifies the supplied key (from QR code) against the hash (previously retrieved from CiviCRM custom field), using PHP's password_verify() function
+function validateKey(string $key, string $hash) { 
+  if (strlen($hash) > 20 && password_verify($key, $hash)) {
+    return TRUE;
+  }
+  return FALSE;
+}
+
+// Get basic data for the contact: display name and ID card hash
+function getContactData(int $cid) {
+  try {
+    return \Civi\Api4\Contact::get(FALSE)
+      ->addSelect('display_name', 'rsw_id_card.rswid_card_hash')
+      ->addWhere('id', '=', $cid)
+      ->execute()
+      ->first();
+  }
+  catch (\API_Exception $e) {
+    return NULL;
+  }
+}
+
+// Get current PRRPS approval records for a contact using APIv4
+function getApprovalsData(int $cid) {
+  try {
+    return \Civi\Api4\CustomValue::get('PRRPS_Approvals', FALSE)
+      ->addSelect('Approval:label', 'Date', 'Expiry_date', 'Other_detail')
+      ->addWhere('entity_id', '=', $cid)
+      ->addWhere('Is_latest_record', '=', TRUE)
+      ->addWhere('Approval_withdrawn', '=', FALSE)
+      ->addClause('OR', ['Expiry_date', 'IS NULL'], ['Expiry_date', '>=', 'now'])
+      ->addOrderBy('Approval:label', 'ASC')
+      ->addOrderBy('Date', 'DESC')
+      ->execute();
+  }
+  catch (\API_Exception $e) {
+    return NULL;
+  }
+}
+
+// Get current PRRPS training and assessments records for a contact using APIv4
+function getTrainingAssessData(int $cid) {
+  try {
+    return \Civi\Api4\CustomValue::get('PRRPS_Assessments_Training', FALSE)
+      ->addSelect('Assessment_or_training_name:label', 'Record_type:label', 'Date', 'Expiry_date', 'Other_detail')
+      ->addWhere('entity_id', '=', $cid)
+      ->addWhere('Is_latest_record', '=', TRUE)
+      ->addWhere('Assessment_result', 'NOT IN', [2, 5]) // 2 == 'Not yet competent', 5 == 'Insufficient evidence of competence'. (I don't know what is the difference but anyway we check for both.)
+      ->addClause('OR', ['Expiry_date', 'IS NULL'], ['Expiry_date', '>=', 'now'])
+      ->addOrderBy('Assessment_or_training_name:label', 'ASC')
+      ->addOrderBy('Date', 'DESC')
+      ->execute();
+  }
+  catch (\API_Exception $e) {
+    return NULL;
+  }
+}
+
+// Get current external qualifications and training records for a contact using APIv4
+function getExternalQualData(int $cid) {
+  try {
+    return \Civi\Api4\CustomValue::get('External_Training_Qualifications', FALSE)
+      ->addSelect('Name_of_training_qualification:label', 'Date', 'Expiry_date', 'Other_detail')
+      ->addWhere('entity_id', '=', $cid)
+      ->addWhere('Is_latest_record', '=', TRUE)
+      ->addClause('OR', ['Expiry_date', 'IS NULL'], ['Expiry_date', '>=', 'now'])
+      ->addOrderBy('Name_of_training_qualification:label', 'ASC')
+      ->addOrderBy('Date', 'DESC')
+      ->execute();
+  }
+  catch (\API_Exception $e) {
+    return NULL;
+  }
+}
+
+// Get the current rail safety health assessment record for a contact using APIv4
+function getRSHealthData(int $cid) {
+  try {
+    return \Civi\Api4\CustomValue::get('Rail_Safety_Health', FALSE)
+      ->addSelect('Category:label', 'Health_assessment_result:label', 'Date', 'Expiry_date', 'Conditions:label', 'Other_detail')
+      ->addWhere('entity_id', '=', $cid)
+      ->addWhere('Is_latest_record', '=', TRUE)
+      ->execute()
+      ->first();
+  }
+  catch (\API_Exception $e) {
+    return NULL;
+  }
+}
+
+// Get the current membership data for a contact using APIv4 (if more than one membership, the one with the latest end date)
+function getMembershipData(int $cid) {
+  try {
+    return \Civi\Api4\Membership::get(FALSE)
+      ->addSelect('membership_type_id:label', 'join_date', 'start_date', 'end_date', 'status_id:label')
+      ->addWhere('contact_id', '=', 2)
+      ->addWhere('status_id.is_current_member', '=', TRUE)
+      ->addOrderBy('end_date', 'DESC')
+      ->execute()
+      ->first();
+  }
+  catch (\API_Exception $e) {
+    return NULL;
+  }
+}
+
+// Gets custom field data from the single-record Licence and Medical Certification
+// custom field group and makes it available to the template. Specific to Phoenix Aero Club.
+function getLicenceMedicalData(int $cid) {
+  try {
+    return \Civi\Api4\Contact::get(FALSE)
+      ->addSelect('Licence_and_Medical_Certificate.Aviation_Reference_Number',
+        'Licence_and_Medical_Certificate.Licence_Type',
+        'Licence_and_Medical_Certificate.Ratings',
+        'Licence_and_Medical_Certificate.Aeroplane_Flight_Review_Expires',
+        'Licence_and_Medical_Certificate.Medical_Class',
+        'Licence_and_Medical_Certificate.Medical_Expiry_Date',
+        'Licence_and_Medical_Certificate.Last_Flight')
+      ->addWhere('id', '=', $cid)
+      ->execute()
+      ->first();
+  }
+  catch (\API_Exception $e) {
+    return NULL;
   }
 }
 

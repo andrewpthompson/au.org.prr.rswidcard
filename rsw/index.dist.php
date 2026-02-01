@@ -4,4 +4,4 @@
 // in the CiviCRM extdirectory.
 // e.g. equire_once '/var/www/joomlasubdirectory/media/civicrm/ext/au.org.prr.rswidcard/extern/rswdata.php';
 
-require_once '../membership/media/civicrm/ext/au.org.prr.rswidcard/extern/rswdata.php';
+require_once '';
