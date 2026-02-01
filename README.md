@@ -15,31 +15,29 @@ The extension is licensed under [AGPL-3.0](LICENSE.txt).
 
 ## Requirements
 
-* PHP v5.6+
-* CiviCRM 4.7+ (tested on 4.7.30 and 5.0.0)
+* PHP v7+ (tested on 8.2)
+* CiviCRM 4.7+ (tested on 6.10)
+* Smarty v3 (tested on 5)
 
 ## Installation
 
-This extension has not yet been published for installation via the web UI or in a public git repo.
+This extension has not yet been published for installation via the web UI (and likely won't be as it's use case is far too specific).
 
 Extract the .zip file into the CiviCRM extensions directory and install via CiviCRM's web UI.
 
 ### Rail safety worker data standalone web page
 This is a stand-alone web page (but it is included in this extension) the retrieves data from CiviCRM's database. 
 The URL to it is embedded in the QR code on the ID cards. As the ext directory may not be directly accessible, 
-and also to permit shorter URLs to minimise the data in the QR code, move `rsw/index.php`
-to a directory `rsw` under the web root.
+and also to permit shorter URLs to minimise the data in the QR code, move `rsw/index.dist.php` to `index.php`
+in a directory `rsw` under the web root.
+
+Presently this does not work on Drupal (TO DO, needs a bit of extra code to bootstrap Drupal, as it does not seem to run without it unlike Joomla and WordPress).
 
 Edit `index.php` with the location of the extension (actually this file is only this one line):
 ```php
 require_once '../membership/media/civicrm/ext/au.org.prr.rswidcard/extern/rswdata.php';
 ```
-And edit the path in `extern/rswdata.php` to `civicrm.config.php`:
-```php
-// Perform bootstrap of CiviCRM
-// Edit the below line with the correct path to CiviCRM
-require_once '../membership/administrator/components/com_civicrm/civicrm/civicrm.config.php';
-```
+Copy/rename `extern/config.dist.php` to `extern/config.local.php`. Edit it to provide the full path to `civicrm.config.php` and the CMS (joomla|drupal|wp).
 
 ### Configuration
 This extension has a configuration form at **Administer > ID Card settings**. This goes some way to allowing the cards' appearance to be customised to suit other organisations.
