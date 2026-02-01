@@ -245,7 +245,7 @@
       {/if}
     </div>
     
-    <script src="{$extBaseUrl}packages/jquery/js/jquery-3.3.1.min.js"></script>
+    <script src="{$extBaseUrl}packages/jquery/js/jquery-3.7.1.min.js"></script>
     <script src="{$extBaseUrl}packages/bootstrap4/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>
